@@ -1,1 +1,2 @@
 # FAT_DeepFFM_Paddle
+基于Paddle复现FAT_DeepFFM模型
