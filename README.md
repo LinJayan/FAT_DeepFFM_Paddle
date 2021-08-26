@@ -3,7 +3,7 @@
 
 ### **一、简介**
 
-本文将深度场感知分解机(FAT-DeepFFM)与组合激发网络(DeepFFM)相结合，提出了一种增强场注意感知FTR模型，作为挤压激发网络(SENet)的增强版本，以突出其特征的重要性。
+论文将深度场感知分解机(DeepFFM)与组合激发网络(CENet)相结合，提出了一种增强场注意感知Fat_DeepFFM模型，CENet作为挤压激发网络(SENet)的增强版本，以突出其特征的重要性。
 
 模型结构如下图：在DeepFFM的基础上，增加CENet作为Field的特征重要性选择。论文中使用到两种特征域交互的计算方式:Inner-product和Hadamard-product,后者的实验结果较好。
 
