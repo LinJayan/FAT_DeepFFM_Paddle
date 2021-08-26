@@ -16,7 +16,6 @@ import paddle
 import paddle.nn as nn
 import paddle.nn.functional as F
 import math
-
 import itertools
 
 
@@ -58,7 +57,6 @@ class FAT_DeepFFMLayer(nn.Layer):
         y_first_order, dnn_input = self.deepffm(cen_out)
         
         # DNNLayer
-        # print(dnn_input.shape)
         y_dnn = self.dnn(dnn_input)
         
         
@@ -121,36 +119,22 @@ class CENLayer(nn.Layer):
 
         # Embedding 
         sparse_inputs_concat = paddle.concat(sparse_inputs, axis=1)  # [batch_size, sparse_feature_number]
-        sparse_embeddings = self.embedding(sparse_inputs_concat)  # [batch_size, sparse_feature_number, sparse_feature_dim]
-        # dense_inputs_re = (dense_inputs * 1e5 + 1e6 + 2).astype('int64')  # [batch_size, dense_feature_number]
+        sparse_embeddings = self.embedding(sparse_inputs_concat)  # [batch_size, sparse_feature_number, sparse_feature_dim] 
       
         dense_inputs_re = paddle.unsqueeze(dense_inputs, axis=2)
         dense_embeddings = paddle.multiply(dense_inputs_re, self.dense_w)
-        # print(dense_embeddings.shape)
-        # print(dense_inputs_re)
-        # dense_embeddings = self.embedding(dense_inputs_re)  # [batch_size, dense_feature_number, dense_feature_dim]
-
+        
         feat_embeddings = paddle.concat([sparse_embeddings, dense_embeddings], 1)  # [batch_size, dense_feature_number + feature_number, dense_feature_dim]
-        # print(feat_embeddings.shape)
         feat_embeddings = paddle.reshape(feat_embeddings,[-1,self.num_fields*self.num_fields,self.feature_dim])
-        # print(feat_embeddings.shape)
-
-        # ==============
-        # feat_embeddings_ = paddle.flatten(feat_embeddings,start_axis=1, stop_axis=- 1)  # [batch_size,num_fields*feature_dim]
-        # feat_embeddings_out = self.dnn_cen(feat_embeddings_) # [batch_size,num_fields*feature_dim]
-        # cen_input = paddle.reshape(feat_embeddings_out,[-1,self.num_fields,self.feature_dim])
-        # ==============
-
+        
         # inputs: emb_inputs, shape = (B, N^2, E) if squared else (B, N, E)
         # output: pooled_inputs, shape = (B,  N^2, 1)
         pooled_inputs = self.pooling(feat_embeddings) 
-        # print(pooled_inputs.shape)
        
         # Flatten pooled_inputs
         # inputs: pooled_inputs, shape = (B, N^2, 1)
         # output: pooled_inputs, shape = (B, N^2)
         pooled_inputs = paddle.flatten(pooled_inputs, start_axis=1, stop_axis=- 1, name=None)
-        # print(pooled_inputs.shape)
         
         # Calculate attention weight with dense layer forwardly
         # inputs: pooled_inputs, shape = (B,  N^2)
@@ -167,11 +151,8 @@ class CENLayer(nn.Layer):
         attn_w = paddle.split(attn_w, num_or_sections=self.feature_dim, axis=1)
         attn_w = paddle.stack(attn_w,axis=2)
 
-
         # Multiply attentional weights on field embedding tensors
-      
         outputs = paddle.multiply(feat_embeddings, attn_w) # (B,  N^2, E)
-        # print('outputs',outputs.shape)
 
         return outputs
         
@@ -181,7 +162,7 @@ class MLPLayer(nn.Layer):
         super(MLPLayer, self).__init__(**kwargs)
 
         if units_list is None:
-            units_list = [400, 400, 39]
+            units_list = [400, 400, 1]
         units_list = [input_shape] + units_list
 
         self.units_list = units_list
@@ -219,8 +200,10 @@ class MLPLayer(nn.Layer):
 
     def forward(self, inputs):
         outputs = inputs
+        drop_out = paddle.nn.Dropout(p=0.5)
         for n_layer in self.mlp:
             outputs = n_layer(outputs)
+            outputs = drop_out(outputs)
         return outputs
 
 
@@ -280,12 +263,14 @@ class DeepFFM(nn.Layer):
         self.num_field = sparse_num_field + dense_feature_dim # sparse_num_field
         self.sparse_feature_dim = sparse_feature_dim
         self.is_H = is_H
+        self.mlp =  MLPLayer(num_field*num_field)
         
 
     def forward(self,feat_embedding):
         # -------------------- first order term  --------------------
         feat_embedding_ = paddle.sum(feat_embedding, 2)
-        y_first_order = paddle.sum(feat_embedding_, 1,keepdim=True)
+        y_first_order_ = self.mlp(feat_embedding_)
+        y_first_order = paddle.sum(y_first_order_, 1,keepdim=True)
 
         # -------------------Field-aware second order term  --------------------
         # feat_embedding [bacth_size,num_field*num_field,feature_dim]
