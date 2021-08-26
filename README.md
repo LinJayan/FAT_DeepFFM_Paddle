@@ -5,7 +5,7 @@
 
 论文将深度场感知分解机(DeepFFM)与组合激发网络(CENet)相结合，提出了一种增强场注意感知Fat_DeepFFM模型，CENet作为挤压激发网络(SENet)的增强版本，以突出其特征的重要性。
 
-模型结构如下图：在DeepFFM的基础上，增加CENet作为Field的特征重要性选择。论文中使用到两种特征域交互的计算方式:Inner-product和Hadamard-product,后者的实验结果较好。
+模型结构如下图：在DeepFFM的基础上，增加CENet作为Field的特征重要性选择。论文中使用到两种特征域交互的计算方式:Inner-product和Hadamard-product,论文中后者的实验结果较好。目前复现实验的结果采用的是Inner-product方式，接下来采用第二种方式进行复现实验。
 
 ![](https://ai-studio-static-online.cdn.bcebos.com/21504be5f36145cba22c4db58014c555f8220129ce6d4729af61975a03e42b99)
 
