@@ -77,7 +77,7 @@ tar xzvf slot_train_data_full.tar.gz
 ```
 ├─models
    ├─ rank
-        ├─fat_deepffm # DIFM模型代码
+        ├─fat_deepffm # FAT_DeepFFM模型代码
         ├──  data #样例数据
         ├── __init__.py
         ├── config.yaml # sample数据配置
