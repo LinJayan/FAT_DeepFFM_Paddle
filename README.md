@@ -53,7 +53,7 @@ Python >= 3.7
 
  ============================== Step 1,git clone 代码库 ==============================
  
-git clone git@github.com:LinJayan/FAT_DeepFFM_Paddle.git
+git clone https://github.com/PaddlePaddle/PaddleRec.git
 
 ============================== Step 2 download data ==============================
 
