@@ -269,8 +269,8 @@ class DeepFFM(nn.Layer):
     def forward(self,feat_embedding):
         # -------------------- first order term  --------------------
         feat_embedding_ = paddle.sum(feat_embedding, 2)
-        y_first_order_ = self.mlp(feat_embedding_)
-        y_first_order = paddle.sum(y_first_order_, 1,keepdim=True)
+        # y_first_order_ = self.mlp(feat_embedding_)
+        y_first_order = paddle.sum(feat_embedding_, 1,keepdim=True)
 
         # -------------------Field-aware second order term  --------------------
         # feat_embedding [bacth_size,num_field*num_field,feature_dim]
