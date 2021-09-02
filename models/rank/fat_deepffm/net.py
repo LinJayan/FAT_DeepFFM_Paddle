@@ -113,7 +113,7 @@ class CENLayer(nn.Layer):
 
         units_list = [num_fields*sparse_feature_dim,512,num_fields*sparse_feature_dim]
         input_shape = num_fields*sparse_feature_dim
-        self.dnn_cen =  MLPLayer(input_shape, units_list=units_list, l2=0.01, last_action=True)
+        
 
     def forward(self, sparse_inputs, dense_inputs):
 
