@@ -263,7 +263,7 @@ class DeepFFM(nn.Layer):
         self.num_field = sparse_num_field + dense_feature_dim # sparse_num_field
         self.sparse_feature_dim = sparse_feature_dim
         self.is_H = is_H
-        self.mlp =  MLPLayer(num_field*num_field)
+        # self.mlp =  MLPLayer(num_field*num_field)
         
 
     def forward(self,feat_embedding):
